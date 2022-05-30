@@ -16,7 +16,7 @@ use lurk::field::LurkField;
 use lurk::store::{Ptr, Store};
 use syntax::Term;
 
-struct ParseStore<F: LurkField>(Store<F>);
+pub struct ParseStore<F: LurkField>(Store<F>);
 
 impl<F: LurkField> ParseStore<F> {
     pub fn read(&mut self, input: &str) -> Option<Ptr<F>> {

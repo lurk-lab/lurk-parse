@@ -44,9 +44,9 @@ impl<F: LurkField> Print<F> {
     pub fn from_term(term: &Term<F>) -> Self {
         match term {
             Term::Nil => Print::List(vec![]),
-            Term::Sym(x) => Print::Sym(x.clone()),
-            Term::Str(x) => Print::Str(x.clone()),
-            Term::Num(x) => Print::Num(x.clone()),
+            Term::Sym(x) => Print::Sym(x.to_string()),
+            Term::Str(x) => Print::Str(x.to_string()),
+            Term::Num(x) => Print::Num(*x),
             Term::Cons(x, y) => match Print::from_term(y) {
                 Print::List(mut xs) => {
                     xs.push(Print::from_term(x));
@@ -64,7 +64,7 @@ impl<F: LurkField> Print<F> {
             }
             Print::Pair(car, cdr) => format!("({} . {})", car.print(), cdr.print()),
             Print::Str(sym) => format!("\"{}\"", sym.escape_default()),
-            Print::Sym(sym) => format!("{}", sym),
+            Print::Sym(sym) => sym.to_string(),
             Print::Num(Num::Scalar(s)) => {
                 let bytes = s.to_repr();
                 let n = BigUint::from_bytes_le(bytes.as_ref());
@@ -77,7 +77,7 @@ impl<F: LurkField> Print<F> {
 
 impl<F: LurkField> Term<F> {
     pub fn print(&self) -> String {
-        Print::from_term(&self).print()
+        Print::from_term(self).print()
     }
 }
 
@@ -88,14 +88,14 @@ impl<F: LurkField> fmt::Display for Term<F> {
 }
 
 pub fn reserved_symbols() -> Vec<String> {
-    Vec::from(vec![
+    vec![
         String::from(";;"),
         String::from(";"),
         String::from("."),
         String::from("'"),
         String::from(")"),
         String::from("("),
-    ])
+    ]
 }
 
 pub fn parse_line_comment(i: Span) -> IResult<Span, Span, ParseError<Span>> {
@@ -176,7 +176,7 @@ pub fn parse_str<F: LurkField>() -> impl Fn(Span) -> IResult<Span, Term<F>, Pars
         let (i, _) = context("open quotes", tag("\""))(i)?;
         let (i, s) = parse_string("\"")(i)?;
         let (upto, _) = tag("\"")(i)?;
-        Ok((upto, Term::Str(s.into())))
+        Ok((upto, Term::Str(s)))
     }
 }
 

@@ -26,7 +26,7 @@ pub enum ParseErrorKind {
     Nom(ErrorKind),
 }
 
-impl<'a> fmt::Display for ParseErrorKind {
+impl fmt::Display for ParseErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidBase16EscapeSequence(seq) => {

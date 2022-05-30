@@ -108,17 +108,13 @@ pub fn parse_string<'a>(
     halt: &'static str,
 ) -> impl Fn(Span<'a>) -> IResult<Span<'a>, String, ParseError<Span<'a>>> {
     move |from: Span<'a>| {
-        fold_many0(
-            parse_fragment(halt),
-            || String::new(),
-            |mut string, fragment| {
-                match fragment {
-                    StringFragment::Literal(s) => string.push_str(s.fragment()),
-                    StringFragment::EscapedChar(c) => string.push(c),
-                    StringFragment::EscapedWS => {}
-                }
-                string
-            },
-        )(from)
+        fold_many0(parse_fragment(halt), String::new, |mut string, fragment| {
+            match fragment {
+                StringFragment::Literal(s) => string.push_str(s.fragment()),
+                StringFragment::EscapedChar(c) => string.push(c),
+                StringFragment::EscapedWS => {}
+            }
+            string
+        })(from)
     }
 }
